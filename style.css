@@ -17,6 +17,4 @@
 #feedback-send{padding:9px 16px}
 #feedback-status{margin:10px 0 0}
 
-.feedback-include{display:flex;align-items:flex-start;gap:10px;margin:4px 0 8px;font-weight:500;cursor:pointer}
-.feedback-include input{flex:0 0 auto;width:18px;height:18px;margin-top:4px;accent-color:var(--accent)}
 .feedback .hint{font-size:.9rem}
