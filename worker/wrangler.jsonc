@@ -1,0 +1,17 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "animal-rights-language-reviewer-api",
+  "main": "src/index.js",
+  "compatibility_date": "2026-10-01",
+  "rules": [
+    { "type": "Text", "globs": ["**/*.md"], "fallthrough": true }
+  ],
+  "vars": {
+    "ALLOWED_ORIGIN": "https://vacmanager.github.io",
+    "MODEL": "gpt-5",
+    "EXPECTED_HOSTNAME": "vacmanager.github.io"
+  },
+  "ratelimits": [
+    { "name": "REVIEW_LIMIT", "namespace_id": "10517", "simple": { "limit": 3, "period": 60 } }
+  ]
+}
