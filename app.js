@@ -41,23 +41,69 @@
   function escapeHtml(s) { return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
   function inline(s) { return escapeHtml(s).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/`([^`]+)`/g,'<code>$1</code>'); }
   function renderMarkdown(md) {
-    const lines = md.replace(/\r\n/g,'\n').split('\n');
+    const lines = md.replace(/\r\n/g, '\n').split('\n');
     const out = [];
-    let list = false, quote = false;
-    const close = () => { if(list){out.push('</ul>');list=false;} if(quote){out.push('</blockquote>');quote=false;} };
-    for(const raw of lines){
-      const line=raw.trim();
-      if(!line){ close(); continue; }
-      const heading=line.match(/^(#{1,4})\s+(.+)$/);
-      if(heading){close(); const n=heading[1].length;out.push(`<h${n}>${inline(heading[2])}</h${n}>`);continue;}
-      if(line.startsWith('> ')){if(list){out.push('</ul>');list=false;}if(!quote){out.push('<blockquote>');quote=true;}out.push(`<p>${inline(line.slice(2))}</p>`);continue;}
-      if(quote){out.push('</blockquote>');quote=false;}
-      const bullet=line.match(/^(?:[-*]|\d+[.)])\s+(.+)$/);
-      if(bullet){if(!list){out.push('<ul>');list=true;}out.push(`<li>${inline(bullet[1])}</li>`);continue;}
-      if(list){out.push('</ul>');list=false;}
-      out.push(`<p>${inline(line)}</p>`);
+    // Preserve indentation so Markdown sub-bullets remain inside their parent items.
+    const lists = [];
+    let quote = false;
+    function closeLists() {
+      while (lists.length) {
+        const current = lists.pop();
+        if (current.itemOpen) out.push('</li>');
+        out.push('</' + current.type + '>');
+      }
     }
-    close();return out.join('\n');
+    function closeQuote() {
+      if (quote) { out.push('</blockquote>'); quote = false; }
+    }
+    function openList(type, indent) {
+      out.push('<' + type + '>');
+      lists.push({type, indent, itemOpen: false});
+    }
+    for (const raw of lines) {
+      const line = raw.trim();
+      if (!line) continue;
+      const heading = line.match(/^(#{1,4})\s+(.+)$/);
+      if (heading) {
+        closeLists(); closeQuote();
+        const n = heading[1].length;
+        out.push('<h' + n + '>' + inline(heading[2]) + '</h' + n + '>');
+        continue;
+      }
+      if (line.startsWith('> ')) {
+        closeLists();
+        if (!quote) { out.push('<blockquote>'); quote = true; }
+        out.push('<p>' + inline(line.slice(2)) + '</p>');
+        continue;
+      }
+      closeQuote();
+      const match = raw.match(/^(\s*)([-*+]|\d+[.)])\s+(.+)$/);
+      if (match) {
+        // Tabs are equivalent to four spaces for indentation.
+        const indent = match[1].replace(/\t/g, '    ').length;
+        const type = /^\d/.test(match[2]) ? 'ol' : 'ul';
+        while (lists.length && (indent < lists[lists.length - 1].indent ||
+          (indent === lists[lists.length - 1].indent && type !== lists[lists.length - 1].type))) {
+          const old = lists.pop();
+          if (old.itemOpen) out.push('</li>');
+          out.push('</' + old.type + '>');
+        }
+        if (!lists.length) {
+          openList(type, indent);
+        } else if (indent > lists[lists.length - 1].indent) {
+          openList(type, indent);
+        }
+        const current = lists[lists.length - 1];
+        if (current.itemOpen) out.push('</li>');
+        out.push('<li>' + inline(match[3]));
+        current.itemOpen = true;
+        continue;
+      }
+      closeLists();
+      out.push('<p>' + inline(line) + '</p>');
+    }
+    closeLists(); closeQuote();
+    return out.join('\n');
   }
   area.addEventListener('input', ready);
   file.addEventListener('change', async () => {
