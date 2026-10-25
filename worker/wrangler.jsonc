@@ -8,7 +8,7 @@
   ],
   "vars": {
     "ALLOWED_ORIGIN": "https://vacmanager.github.io",
-    "MODEL": "gpt-5",
+    "MODEL": "gpt-6.1-sol",
     "EXPECTED_HOSTNAME": "vacmanager.github.io"
   },
   "ratelimits": [
