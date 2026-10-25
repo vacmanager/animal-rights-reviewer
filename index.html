@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Review written material for language and assumptions that reinforce speciesism or misrepresent animal rights and veganism.">
+  <title>Animal rights language reviewer</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="config.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div class="eyebrow">AI-assisted writing review</div>
+      <h1>Animal rights language reviewer</h1>
+      <p class="lead">Understand how your writing presents other animals, animal rights and veganism. Receive explanations of language and assumptions that may reinforce speciesism, with suggested corrections.</p>
+    </header>
+    <section class="panel" aria-labelledby="your-text-title">
+      <h2 id="your-text-title">Text to review</h2>
+      <p class="hint">Paste text or select a plain text (.txt) or Markdown (.md) file. Maximum 20,000 characters. The service does not accept confidential material.</p>
+      <label for="document">Your document</label>
+      <textarea id="document" spellcheck="false" placeholder="Paste your article, submission or other text here…" rows="13"></textarea>
+      <div class="input-bar">
+        <label class="file-action" for="file">Choose .txt or .md file</label>
+        <input id="file" type="file" accept=".txt,.md,text/plain,text/markdown">
+        <span id="count" aria-live="polite">0 / 20,000 characters</span>
+      </div>
+      <div id="challenge" class="challenge"></div>
+      <button id="review" type="button" disabled>Review language</button>
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+    </section>
+    <section id="results" class="panel" hidden aria-labelledby="result-title">
+      <div class="result-bar"><h2 id="result-title">Your review</h2><button id="copy" type="button" class="secondary">Copy review</button></div>
+      <div id="report" class="report"></div>
+    </section>
+    <aside class="note"><strong>Advisory only.</strong> AI reviews can contain errors or omissions. Consider each suggestion in context. Submitted text is transmitted to a third-party AI service for analysis. Do not submit private, sensitive or confidential documents. This prototype does not store your submission or report in its own database.</aside>
+    <footer>Animal rights language reviewer · Prototype version 0.1</footer>
+  </main>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+</body>
+</html>
