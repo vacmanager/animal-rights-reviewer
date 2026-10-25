@@ -8,6 +8,8 @@
   const results = document.getElementById('results');
   const report = document.getElementById('report');
   const counter = document.getElementById('count');
+  const copyButton = document.getElementById('copy');
+  const copyStatus = document.getElementById('copy-status');
   let widgetId = null;
   let token = '';
   let lastReport = '';
@@ -114,7 +116,11 @@
   });
   button.addEventListener('click', async () => {
     if(button.disabled) return;
-    button.disabled=true;results.hidden=true;setStatus('Reviewing your text…');
+    button.disabled=true;results.hidden=true;
+    copyButton.textContent = 'Copy review';
+    copyStatus.textContent = '';
+    status.classList.add('loading');
+    setStatus('Reviewing your text… This may take a minute or two.');
     try{
       const response=await fetch(`${cfg.apiBase.replace(/\/$/,'')}/review`,{
         method:'POST',headers:{'Content-Type':'application/json'},
@@ -126,11 +132,16 @@
       setStatus('Review complete. The suggestions are advisory.');
       results.scrollIntoView({behavior:'smooth',block:'start'});
     }catch(error){setStatus(error.message || 'Unable to review. Try again later.',true);}
-    finally{resetChallenge();}
+    finally{status.classList.remove('loading');resetChallenge();}
   });
-  document.getElementById('copy').addEventListener('click',async()=>{
-    try{await navigator.clipboard.writeText(lastReport);setStatus('Review copied.');}
-    catch{setStatus('Copy unavailable in this browser.',true);}
+  copyButton.addEventListener('click',async()=>{
+    try {
+      await navigator.clipboard.writeText(lastReport);
+      copyButton.textContent = 'Copied!';
+      copyStatus.textContent = 'Review copied to clipboard.';
+    } catch {
+      copyStatus.textContent = 'Unable to copy. Please select and copy the review manually.';
+    }
   });
   ready(); initTurnstile();
 })();
