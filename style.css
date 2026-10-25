@@ -18,3 +18,5 @@
 #feedback-status{margin:10px 0 0}
 
 .feedback .hint{font-size:.9rem}
+
+.review-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
