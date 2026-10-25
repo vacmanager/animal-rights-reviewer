@@ -52,7 +52,7 @@ Worker JSON -> browser HTML-rendered report and copy function
 
 ### Updating and redeploying
 
-- **Reviewer behaviour:** edit `worker/reference/instructions.md`, then run `npm run deploy` in `worker/` and rerun the known test documents. Keep a backup of the previous version and note what changed.
+- **Reviewer behaviour:** edit `worker/reference/instructions.md`; the connected GitHub deployment updates the Worker automatically when a commit reaches `main`. Verify deployment and rerun known test documents. Keep a backup of the previous version and note what changed.
 - **Reference guide:** update `worker/reference/language-guide.md`, preserving its meaning and checking against original sources. Redeploy the Worker. The original source guide is intentionally retained verbatim, including organisational names in source prose; these are reference data, **not instructions to mention the organisation**.
 - **AI model:** change `MODEL` in `worker/wrangler.jsonc`, redeploy and test. The exact ChatGPT identity behind the previously tested “AI1” is not established by knowing only that it was accessed via OpenAI. Different API models may produce different results.
 - **Frontend:** edit `index.html`, `app.js`, `style.css` or `config.js` at the repository root and commit/push to GitHub Pages. No Worker redeploy is necessary for CSS or HTML changes.
@@ -69,6 +69,10 @@ Worker JSON -> browser HTML-rendered report and copy function
 - Model output is capped to **11,000 output tokens**, including reasoning tokens; longer documents/reports may still be incomplete. Test latency and completeness with real submissions. The server-side upstream timeout is 110 seconds.
 - The public GitHub repository necessarily exposes the frontend; the Worker bundle also contains the ethically oriented **reference content** (not the secret key). Do not include confidential materials as reference documents.
 
+
+### Reviewer instruction revisions
+
+- **26 October 2026 (v2.3 clarification):** In advocacy seeking to end a particular use of animals, distinguish abolition of that practice from the broader objective of ending all animal exploitation. Briefly note the narrower objective in the overall assessment when relevant, without making it an automatic language fault or requiring every focused article to argue for veganism. Test this with the Moruya rodeo campaign and unrelated news reporting.
 
 ### Live deployment and review feedback
 
