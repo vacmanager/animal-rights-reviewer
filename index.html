@@ -35,15 +35,13 @@
       <div id="report" class="report"></div>
       <section class="feedback" aria-labelledby="feedback-title">
         <h3 id="feedback-title">Was this review helpful?</h3>
-        <p class="hint">Tell us what worked or what needs improving. Feedback is sent only if you send the email draft. Your document and review are excluded unless you select the checkbox below.</p>
+        <p class="hint">Tell us what worked or what needs improving. Feedback is sent only if you send the email draft. Your document and review are not included.</p>
         <div class="feedback-choices" role="group" aria-label="Review helpfulness">
           <button type="button" class="feedback-choice secondary" data-rating="Helpful" aria-pressed="false">Helpful</button>
           <button type="button" class="feedback-choice secondary" data-rating="Not helpful" aria-pressed="false">Not helpful</button>
         </div>
         <label for="feedback-comment">Comment (optional)</label>
         <textarea id="feedback-comment" rows="3" maxlength="1200" placeholder="For example, a useful suggestion or an issue that was missed…"></textarea>
-        <label class="feedback-include"><input id="feedback-include-text" type="checkbox"> Include my submitted document and the review in the feedback email</label>
-        <p class="hint">Leave this unchecked if you don't want to share your text. Large documents may need to be pasted into the email manually; the site will explain when this applies.</p>
         <button id="feedback-send" type="button" disabled>Email feedback</button>
         <p id="feedback-status" class="hint" role="status" aria-live="polite"></p>
       </section>
