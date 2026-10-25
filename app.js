@@ -189,8 +189,8 @@
     const opened = !!draftWindow;
     if (large) {
       try {
-        await navigator.clipboard.writeText(message);
-        feedbackStatus.textContent = 'Email draft requested. The full document, review and feedback are copied to your clipboard: paste them into the draft before sending.' +
+        await navigator.clipboard.writeText(includedText);
+        feedbackStatus.textContent = 'Email draft requested. The full document and review are copied to your clipboard: paste them into the draft before sending.' +
           (opened ? '' : ' If no draft opened, please open your email application manually.');
       } catch {
         feedbackStatus.textContent = 'The document is too long to add automatically, and clipboard copying failed. Please copy the document and review manually into your email draft before sending.';
