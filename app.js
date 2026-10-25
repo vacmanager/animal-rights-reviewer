@@ -4,6 +4,7 @@
   const area = document.getElementById('document');
   const file = document.getElementById('file');
   const button = document.getElementById('review');
+  const clearButton = document.getElementById('clear');
   const status = document.getElementById('status');
   const results = document.getElementById('results');
   const report = document.getElementById('report');
@@ -113,6 +114,24 @@
     closeLists(); closeQuote();
     return out.join('\n');
   }
+  clearButton.addEventListener('click', () => {
+    area.value = '';
+    file.value = '';
+    lastReport = '';
+    report.textContent = '';
+    results.hidden = true;
+    status.classList.remove('loading');
+    setStatus('');
+    copyButton.textContent = 'Copy review';
+    copyStatus.textContent = '';
+    feedbackRating = '';
+    feedbackComment.value = '';
+    feedbackStatus.textContent = '';
+    feedbackSend.disabled = true;
+    feedbackButtons.forEach(b => b.setAttribute('aria-pressed', 'false'));
+    ready();
+    area.focus();
+  });
   area.addEventListener('input', ready);
   file.addEventListener('change', async () => {
     const selected = file.files?.[0]; if(!selected) return;
@@ -121,7 +140,7 @@
   });
   button.addEventListener('click', async () => {
     if(button.disabled) return;
-    button.disabled=true;results.hidden=true;
+    button.disabled=true;clearButton.disabled=true;results.hidden=true;
     copyButton.textContent = 'Copy review';
     copyStatus.textContent = '';
     feedbackRating = '';
@@ -142,7 +161,7 @@
       setStatus('Review complete. The suggestions are advisory.');
       results.scrollIntoView({behavior:'smooth',block:'start'});
     }catch(error){setStatus(error.message || 'Unable to review. Try again later.',true);}
-    finally{status.classList.remove('loading');resetChallenge();}
+    finally{status.classList.remove('loading');clearButton.disabled=false;resetChallenge();}
   });
   copyButton.addEventListener('click',async()=>{
     try {
