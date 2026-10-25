@@ -29,7 +29,7 @@
       sitekey: cfg.turnstileSiteKey,
       callback: t => { token = t; ready(); },
       'expired-callback': () => { token=''; ready(); },
-      'error-callback': () => { token=''; ready(); setStatus('Security check failed. Reload this page and try again.',true); }
+      'error-callback': (errorCode) => { token=''; ready(); setStatus(`Security check failed (Cloudflare code: ${errorCode || 'unknown'}). Please verify the site key and authorised hostname.`,true); }
     });
   }
   function resetChallenge() {
