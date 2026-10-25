@@ -72,7 +72,8 @@ export default {
           body: JSON.stringify({
             model: env.MODEL,
             store: false,
-            max_output_tokens: 4500,
+            max_output_tokens: 8500,
+            reasoning: {effort: 'low'},
             input: [
               {role: 'developer', content: instructions + '\n\nREFERENCE PRINCIPLES AND LANGUAGE GUIDE:\n' + guide},
               {role: 'user', content: task}
@@ -88,7 +89,17 @@ export default {
       } finally { clearTimeout(timeout); }
     } catch { return reply({error:'Review service temporarily unavailable.'}, 502, cors); }
     const report = outputText(result);
-    if (!report) return reply({error:'No completed review was returned. Please try again.'}, 502, cors);
+    // Reasoning tokens count towards max_output_tokens. An incomplete response can
+    // exhaust the allowance before any user-visible text is generated.
+    if (result.status === 'incomplete') {
+      const reason = result.incomplete_details?.reason || 'unknown';
+      return reply({error: reason === 'max_output_tokens'
+        ? 'The review exceeded its response limit. Please try a shorter document.'
+        : 'The review was interrupted before completion. Please try again.'}, 502, cors);
+    }
+    if (result.status !== 'completed' || !report) {
+      return reply({error:'OpenAI did not return a completed review. Please try again.'}, 502, cors);
+    }
     return reply({report}, 200, cors);
   }
 };
