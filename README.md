@@ -5,18 +5,18 @@
 
 This project provides a GitHub Pages frontend and a Cloudflare Worker backend. The Worker sends one request per review to OpenAI's Responses API, using the complete reviewer instructions and principles/language guide as its reference context. The site is intended to provide *advisory* language reviews, not authoritative editorial decisions.
 
-## What you need to do
+## Deployment procedure (GitHub + Cloudflare dashboard)
 
-You do not need to share any credentials with ChatGPT.
+The frontend is already committed at the **repository root** and published through GitHub Pages at https://vacmanager.github.io/animal-rights-reviewer/. GitHub Pages does not provide the protected API endpoint.
 
-1. **GitHub:** Create a repository (e.g. `animal-rights-reviewer`) and upload the prepared repository files (`index.html`, `app.js`, `style.css`, `config.js`, `worker/` and `README.md`) to its root. In repository **Settings → Pages**, publish from the main branch/root. GitHub Pages sites are publicly reachable: an obscure URL is not secure private access. For testing, publish without advertising it; do not rely on URL secrecy.
-2. **Cloudflare:** Create a free Cloudflare account if needed and a **Turnstile widget** restricted to the eventual GitHub Pages hostname (or custom hostname). Save its **site key** and **secret key** separately. Use the same hostname in `EXPECTED_HOSTNAME`.
-3. **Worker:** Install Node.js and then, in the `worker` directory, run `npm install` and `npx wrangler login`. Edit `wrangler.jsonc` with the exact GitHub Pages **origin** (for example `https://vacmanager.github.io`), the expected hostname (`vacmanager.github.io`), and the actual OpenAI API model ID. Run `npm run deploy`. The sample `MODEL` is a placeholder baseline, **not a verified identity for AI1**.
-4. **Secrets:** Run `npx wrangler secret put OPENAI_API_KEY` and `npx wrangler secret put TURNSTILE_SECRET_KEY` from the `worker` directory. Paste each key into the CLI prompt. **Never commit them to GitHub.** Set up an OpenAI API project, billing and low project usage/budget alerts before making the site public. A ChatGPT subscription does not automatically provide API credit.
-5. **Link frontend:** Edit `site/config.js`: set the deployed Worker URL and the public Turnstile site key. Push the change to GitHub. The Worker must allow the same origin in `wrangler.jsonc`.
-6. **Smoke test:** Open the GitHub Pages URL, paste a non-confidential test passage (at least 80 characters), complete Turnstile and request a review. Verify that the resulting report is readable and that no API keys appear in browser/network-visible source. Test a second input and the copy button.
+1. In Cloudflare **Workers & Pages → Create application → GitHub**, connect the repository `vacmanager/animal-rights-reviewer`. Configure the Worker **name** as `animal-rights-language-reviewer-api`, matching `worker/wrangler.jsonc`; **production branch** `main`; **root directory** `worker`; **deploy command** `npx wrangler deploy`. Keep the Worker code separate from GitHub Pages. Confirm the deployment succeeds and record its actual `https://....workers.dev` address. Cloudflare Workers Builds can deploy from GitHub automatically on subsequent commits.
+2. In Cloudflare **Turnstile**, create a **Managed** widget named `Animal rights language reviewer`, restricted to hostname `vacmanager.github.io` (hostname only, without `https://` or repository path). Retain the public **site key** and private **secret key** separately.
+3. In Cloudflare **Workers & Pages → your Worker → Settings → Variables and Secrets**, add two **Secret** values: `OPENAI_API_KEY` and `TURNSTILE_SECRET_KEY`. Create the OpenAI project/API key through https://platform.openai.com/ and configure billing, modest project budgets and alerts. The ChatGPT subscription is separate from API billing. Never store these secrets in GitHub or a message.
+4. The Worker config is preconfigured for GitHub Pages origin `https://vacmanager.github.io`, expected Turnstile hostname `vacmanager.github.io` and sample model `gpt-5`. **This model has not been established as identical to the model used in the earlier AI1 experiments**. To change models, edit `worker/wrangler.jsonc`, redeploy and test the benchmark.
+5. After the Worker is deployed and the Turnstile widget exists, edit the root-level `config.js` on GitHub. Set `apiBase` to the **actual** Worker URL and `turnstileSiteKey` to the **public** site key. These two values are safe to store in GitHub. They must not be confused with the secret API key or Turnstile secret.
+6. Smoke test the GitHub Pages site with non-confidential material, including a short passage and representative full documents. Verify the browser console/network response, copies of reviews and limits. Until the secrets and public config are complete, the form intentionally remains disabled. Do not announce the site for public use until security, costs and privacy text are checked.
 
-The Worker must be deployed **before** the frontend can produce reviews. No API key is included with this package, and no paid API request was made during its creation.
+For a fallback command-line deployment, install Node.js and run `npm install`, `npx wrangler login`, and `npm run deploy` within `worker/`. Secrets may alternatively be added using `npx wrangler secret put OPENAI_API_KEY` and `npx wrangler secret put TURNSTILE_SECRET_KEY`.
 
 ## Short technical description for maintenance
 
@@ -41,10 +41,10 @@ Worker JSON -> browser HTML-rendered report and copy function
 
 | File | Function |
 |---|---|
-| `site/index.html` | Page layout, disclaimer and input controls |
-| `site/style.css` | Responsive styling |
-| `site/app.js` | Text uploads, Turnstile, API calls and safe minimal Markdown display |
-| `site/config.js` | Public Worker URL and Turnstile **site** key (no secrets) |
+| `index.html` | Page layout, disclaimer and input controls |
+| `style.css` | Responsive styling |
+| `app.js` | Text uploads, Turnstile, API calls and safe minimal Markdown display |
+| `config.js` | Public Worker URL and Turnstile **site** key (no secrets) |
 | `worker/src/index.js` | API endpoint, security checks, prompt construction and response extraction |
 | `worker/wrangler.jsonc` | Worker deployment configuration, permitted origin, model ID and approximate rate-limit binding |
 | `worker/reference/instructions.md` | Reviewer version 2.3, organisation-neutral instructions |
