@@ -56,8 +56,8 @@
     function closeQuote() {
       if (quote) { out.push('</blockquote>'); quote = false; }
     }
-    function openList(type, indent) {
-      out.push('<' + type + '>');
+    function openList(type, indent, firstNumber = 1) {
+      out.push(type === 'ol' ? '<ol start="' + firstNumber + '">' : '<ul>');
       lists.push({type, indent, itemOpen: false});
     }
     for (const raw of lines) {
@@ -82,6 +82,7 @@
         // Tabs are equivalent to four spaces for indentation.
         const indent = match[1].replace(/\t/g, '    ').length;
         const type = /^\d/.test(match[2]) ? 'ol' : 'ul';
+        const number = type === 'ol' ? Number.parseInt(match[2], 10) : 1;
         while (lists.length && (indent < lists[lists.length - 1].indent ||
           (indent === lists[lists.length - 1].indent && type !== lists[lists.length - 1].type))) {
           const old = lists.pop();
@@ -89,13 +90,13 @@
           out.push('</' + old.type + '>');
         }
         if (!lists.length) {
-          openList(type, indent);
+          openList(type, indent, number);
         } else if (indent > lists[lists.length - 1].indent) {
           openList(type, indent);
         }
         const current = lists[lists.length - 1];
         if (current.itemOpen) out.push('</li>');
-        out.push('<li>' + inline(match[3]));
+        out.push(type === 'ol' ? '<li value="' + number + '">' + inline(match[3]) : '<li>' + inline(match[3]));
         current.itemOpen = true;
         continue;
       }
