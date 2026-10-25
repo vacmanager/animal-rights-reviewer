@@ -72,8 +72,8 @@ export default {
           body: JSON.stringify({
             model: env.MODEL,
             store: false,
-            max_output_tokens: 8500,
-            reasoning: {effort: 'low'},
+            max_output_tokens: 11000,
+            reasoning: {effort: 'medium'},
             input: [
               {role: 'developer', content: instructions + '\n\nREFERENCE PRINCIPLES AND LANGUAGE GUIDE:\n' + guide},
               {role: 'user', content: task}
