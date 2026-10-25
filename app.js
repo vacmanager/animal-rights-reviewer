@@ -10,6 +10,11 @@
   const counter = document.getElementById('count');
   const copyButton = document.getElementById('copy');
   const copyStatus = document.getElementById('copy-status');
+  const feedbackButtons = document.querySelectorAll('.feedback-choice');
+  const feedbackComment = document.getElementById('feedback-comment');
+  const feedbackSend = document.getElementById('feedback-send');
+  const feedbackStatus = document.getElementById('feedback-status');
+  let feedbackRating = '';
   let widgetId = null;
   let token = '';
   let lastReport = '';
@@ -119,6 +124,11 @@
     button.disabled=true;results.hidden=true;
     copyButton.textContent = 'Copy review';
     copyStatus.textContent = '';
+    feedbackRating = '';
+    feedbackComment.value = '';
+    feedbackStatus.textContent = '';
+    feedbackSend.disabled = true;
+    feedbackButtons.forEach(b => b.setAttribute('aria-pressed', 'false'));
     status.classList.add('loading');
     setStatus('Reviewing your text… This may take a minute or two.');
     try{
@@ -142,6 +152,23 @@
     } catch {
       copyStatus.textContent = 'Unable to copy. Please select and copy the review manually.';
     }
+  });
+  feedbackButtons.forEach(b => b.addEventListener('click', () => {
+    feedbackRating = b.dataset.rating;
+    feedbackButtons.forEach(other => other.setAttribute('aria-pressed', String(other === b)));
+    feedbackSend.disabled = false;
+    feedbackStatus.textContent = '';
+  }));
+  feedbackSend.addEventListener('click', () => {
+    if (!feedbackRating) return;
+    const message = 'Rating: ' + feedbackRating +
+      (feedbackComment.value.trim() ? '\n\nComment: ' + feedbackComment.value.trim() : '') +
+      '\n\nNo document or review text is included in this message.';
+    const href = 'mailto:info@veganaustralia.org.au?subject=' +
+      encodeURIComponent('Animal rights language reviewer feedback') +
+      '&body=' + encodeURIComponent(message);
+    feedbackStatus.textContent = 'Your email application should open with a draft. Please send the email to submit feedback.';
+    window.location.href = href;
   });
   ready(); initTurnstile();
 })();
