@@ -14,6 +14,8 @@
   const feedbackComment = document.getElementById('feedback-comment');
   const feedbackSend = document.getElementById('feedback-send');
   const feedbackStatus = document.getElementById('feedback-status');
+  const feedbackIncludeText = document.getElementById('feedback-include-text');
+  let reviewedDocument = '';
   let feedbackRating = '';
   let widgetId = null;
   let token = '';
@@ -121,11 +123,14 @@
   });
   button.addEventListener('click', async () => {
     if(button.disabled) return;
+    const submittedDocument = area.value;
     button.disabled=true;results.hidden=true;
     copyButton.textContent = 'Copy review';
     copyStatus.textContent = '';
     feedbackRating = '';
     feedbackComment.value = '';
+    feedbackIncludeText.checked = false;
+    reviewedDocument = '';
     feedbackStatus.textContent = '';
     feedbackSend.disabled = true;
     feedbackButtons.forEach(b => b.setAttribute('aria-pressed', 'false'));
@@ -138,7 +143,7 @@
       });
       const body=await response.json();
       if(!response.ok)throw new Error(body.error || 'Review unavailable');
-      lastReport=body.report;report.innerHTML=renderMarkdown(lastReport);results.hidden=false;
+      lastReport=body.report;reviewedDocument=submittedDocument;report.innerHTML=renderMarkdown(lastReport);results.hidden=false;
       setStatus('Review complete. The suggestions are advisory.');
       results.scrollIntoView({behavior:'smooth',block:'start'});
     }catch(error){setStatus(error.message || 'Unable to review. Try again later.',true);}
@@ -159,16 +164,41 @@
     feedbackSend.disabled = false;
     feedbackStatus.textContent = '';
   }));
-  feedbackSend.addEventListener('click', () => {
+  feedbackSend.addEventListener('click', async () => {
     if (!feedbackRating) return;
-    const message = 'Rating: ' + feedbackRating +
-      (feedbackComment.value.trim() ? '\n\nComment: ' + feedbackComment.value.trim() : '') +
-      '\n\nNo document or review text is included in this message.';
+    const includeText = feedbackIncludeText.checked;
+    const header = 'Rating: ' + feedbackRating +
+      (feedbackComment.value.trim() ? '\n\nComment: ' + feedbackComment.value.trim() : '');
+    const includedText = '\n\n--- Submitted document ---\n' + reviewedDocument +
+      '\n\n--- Generated review ---\n' + lastReport;
+    const message = header + (includeText ? includedText :
+      '\n\nThe submitted document and review were not included.');
+    const subject = 'Animal rights language reviewer feedback';
+    const encodedBody = encodeURIComponent(message);
+    // Email clients have inconsistent limits on mailto URL length. For lengthy
+    // submissions, place the complete content on the clipboard instead.
+    const large = includeText && encodedBody.length > 6000;
+    const mailBody = large
+      ? header + '\n\nI opted to include my document and review. The complete feedback text has been copied to my clipboard. I will paste it below before sending:\n\n'
+      : message;
     const href = 'mailto:info@veganaustralia.org.au?subject=' +
-      encodeURIComponent('Animal rights language reviewer feedback') +
-      '&body=' + encodeURIComponent(message);
-    feedbackStatus.textContent = 'Your email application should open with a draft. Please send the email to submit feedback.';
-    window.location.href = href;
+      encodeURIComponent(subject) + '&body=' + encodeURIComponent(mailBody);
+    // Attempt to open the email handler in a separate tab from the click event.
+    // Browser/email-handler settings ultimately determine where it opens.
+    const draftWindow = window.open(href, '_blank', 'noopener');
+    const opened = !!draftWindow;
+    if (large) {
+      try {
+        await navigator.clipboard.writeText(message);
+        feedbackStatus.textContent = 'Email draft requested. The full document, review and feedback are copied to your clipboard: paste them into the draft before sending.' +
+          (opened ? '' : ' If no draft opened, please open your email application manually.');
+      } catch {
+        feedbackStatus.textContent = 'The document is too long to add automatically, and clipboard copying failed. Please copy the document and review manually into your email draft before sending.';
+      }
+    } else {
+      feedbackStatus.textContent = 'Email draft requested in a new tab. Please review and send it yourself.' +
+        (opened ? '' : ' If no draft appears, check whether your browser has an email application configured.');
+    }
   });
   ready(); initTurnstile();
 })();
