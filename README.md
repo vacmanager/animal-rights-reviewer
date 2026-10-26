@@ -73,7 +73,7 @@ Worker JSON -> browser HTML-rendered report and copy function
 
 ### Public identity and privacy notice
 
-- **26 October 2026:** The interface displays a compact green Vegan Australia wordmark-style identity and a link to the main homepage, without the main website navigation or a large footer. This is a typographic branding treatment, not an embedded official logo image.
+- **26 October 2026:** The interface displays the supplied transparent Vegan Australia logo (a small, optimised PNG at `vegan-australia-logo.png`) linking to the main homepage, without the main website navigation or a large footer.
 - A concise notice below the form links to `/privacy.html`, which discloses Cloudflare Turnstile and Worker processing, OpenAI API processing (`store:false` but not a guarantee of no provider retention), GitHub Pages hosting, possible operational/security logs, the absence of a separate application database, and voluntary email feedback. Keep the notice accurate if services, code, logging or provider policies change.
 - Main site policy: https://veganaustralia.org.au/privacy-policy/; service-specific notice: https://reviewer.veganaustralia.org.au/privacy.html.
 
