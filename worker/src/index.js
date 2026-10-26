@@ -85,8 +85,13 @@ export default {
           signal: controller.signal
         });
         if (!response.ok) {
-          // Don't pass provider details or request text to visitors or application logs.
-          return reply({error: response.status === 429 ? 'Review service is busy. Please try later.' : 'The review could not be completed. Please try later.'}, 502, cors);
+          // Show only a safe status classification; never echo upstream messages,
+          // request contents, API keys or other provider response data.
+          console.warn('Review upstream request failed', {status: response.status});
+          const message = response.status === 429
+            ? 'Review service is busy (OpenAI HTTP 429). Please try again later.'
+            : 'The review service rejected the request (OpenAI HTTP ' + response.status + '). Please try again later or report this code.';
+          return reply({error: message}, 502, cors);
         }
         result = await response.json();
       } finally { clearTimeout(timeout); }
