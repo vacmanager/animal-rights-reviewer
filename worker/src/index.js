@@ -50,8 +50,8 @@ export default {
     if (bytes > MAX_REQUEST_BYTES) return reply({error:'Submission too large'}, 413, cors);
     let payload;
     try { const raw = await request.text(); if (raw.length > MAX_REQUEST_BYTES) return reply({error:'Submission too large'}, 413, cors); payload = JSON.parse(raw); } catch { return reply({error:'Invalid request'}, 400, cors); }
-    if (typeof payload.text !== 'string' || payload.text.trim().length < 80 || payload.text.length > MAX_TEXT_LENGTH) {
-      return reply({error:`Enter 80 to ${MAX_TEXT_LENGTH.toLocaleString()} characters.`}, 400, cors);
+    if (typeof payload.text !== 'string' || payload.text.trim().length === 0 || payload.text.length > MAX_TEXT_LENGTH) {
+      return reply({error:`Enter text of up to ${MAX_TEXT_LENGTH.toLocaleString()} characters.`}, 400, cors);
     }
     if (typeof payload.turnstileToken !== 'string' || payload.turnstileToken.length > 2048) return reply({error:'Complete the security check'}, 400, cors);
     // Approximate per-IP rate limit; additional budget limits should be set at the OpenAI project level.
