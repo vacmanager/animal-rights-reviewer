@@ -7,6 +7,7 @@
   const clearButton = document.getElementById('clear');
   const status = document.getElementById('status');
   const securityStatus = document.getElementById('security-status');
+  const challenge = document.getElementById('challenge');
   const results = document.getElementById('results');
   const report = document.getElementById('report');
   const counter = document.getElementById('count');
@@ -37,13 +38,14 @@
     widgetId = window.turnstile.render('#challenge', {
       sitekey: cfg.turnstileSiteKey,
       appearance: 'interaction-only',
-      callback: t => { token = t; securityStatus.textContent = 'Security check complete'; ready(); },
-      'expired-callback': () => { token=''; securityStatus.textContent = 'Refreshing browser security check…'; ready(); },
-      'error-callback': (errorCode) => { token=''; securityStatus.textContent = 'Security check needs attention'; ready(); setStatus(`Security check failed (Cloudflare code: ${errorCode || 'unknown'}). Please verify the site key and authorised hostname.`,true); }
+      callback: t => { token = t; challenge.classList.add('verified'); securityStatus.textContent = 'Security check complete'; ready(); },
+      'expired-callback': () => { token=''; challenge.classList.remove('verified'); securityStatus.textContent = 'Refreshing browser security check…'; ready(); },
+      'error-callback': (errorCode) => { token=''; challenge.classList.remove('verified'); securityStatus.textContent = 'Security check needs attention'; ready(); setStatus(`Security check failed (Cloudflare code: ${errorCode || 'unknown'}). Please verify the site key and authorised hostname.`,true); }
     });
   }
   function resetChallenge() {
     token = '';
+    challenge.classList.remove('verified');
     securityStatus.textContent = 'Refreshing browser security check…';
     if (widgetId !== null && window.turnstile) window.turnstile.reset(widgetId);
     ready();
