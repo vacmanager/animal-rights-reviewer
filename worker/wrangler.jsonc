@@ -7,9 +7,9 @@
     { "type": "Text", "globs": ["**/*.md"], "fallthrough": true }
   ],
   "vars": {
-    "ALLOWED_ORIGIN": "https://vacmanager.github.io",
+    "ALLOWED_ORIGIN": "https://vacmanager.github.io,https://reviewer.veganaustralia.org.au",
     "MODEL": "gpt-6.1-sol",
-    "EXPECTED_HOSTNAME": "vacmanager.github.io"
+    "EXPECTED_HOSTNAME": "vacmanager.github.io,reviewer.veganaustralia.org.au"
   },
   "ratelimits": [
     { "name": "REVIEW_LIMIT", "namespace_id": "10517", "simple": { "limit": 3, "period": 60 } }
