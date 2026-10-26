@@ -7,7 +7,7 @@ This project provides a GitHub Pages frontend and a Cloudflare Worker backend. T
 
 ## Deployment procedure (GitHub + Cloudflare dashboard)
 
-The frontend is already committed at the **repository root** and published through GitHub Pages at https://vacmanager.github.io/animal-rights-reviewer/. GitHub Pages does not provide the protected API endpoint.
+The frontend is already committed at the **repository root** and published through GitHub Pages at https://reviewer.veganaustralia.org.au/ (custom domain; GitHub Pages remains the host). GitHub Pages does not provide the protected API endpoint.
 
 1. In Cloudflare **Workers & Pages → Create application → GitHub**, connect the repository `vacmanager/animal-rights-reviewer`. Configure the Worker **name** as `animal-rights-language-reviewer-api`, matching `worker/wrangler.jsonc`; **production branch** `main`; **root directory** `worker`; **deploy command** `npx wrangler deploy`. Keep the Worker code separate from GitHub Pages. Confirm the deployment succeeds and record its actual `https://....workers.dev` address. Cloudflare Workers Builds can deploy from GitHub automatically on subsequent commits.
 2. In Cloudflare **Turnstile**, create a **Managed** widget named `Animal rights language reviewer`, restricted to hostname `vacmanager.github.io` (hostname only, without `https://` or repository path). Retain the public **site key** and private **secret key** separately.
@@ -41,10 +41,11 @@ Worker JSON -> browser HTML-rendered report and copy function
 
 | File | Function |
 |---|---|
-| `index.html` | Page layout, disclaimer and input controls |
-| `style.css` | Responsive styling |
+| `index.html` | Branded page layout, concise privacy warning and input controls |
+| `style.css` | Responsive styling for reviewer and privacy page |
 | `app.js` | Text uploads, Turnstile, API calls and safe minimal Markdown display |
 | `config.js` | Public Worker URL and Turnstile **site** key (no secrets) |
+| `privacy.html` | Service-specific data handling information, linked from reviewer |
 | `worker/src/index.js` | API endpoint, security checks, prompt construction and response extraction |
 | `worker/wrangler.jsonc` | Worker deployment configuration, permitted origin, model ID and approximate rate-limit binding |
 | `worker/reference/instructions.md` | Reviewer version 2.3, organisation-neutral instructions |
@@ -70,13 +71,19 @@ Worker JSON -> browser HTML-rendered report and copy function
 - The public GitHub repository necessarily exposes the frontend; the Worker bundle also contains the ethically oriented **reference content** (not the secret key). Do not include confidential materials as reference documents.
 
 
+### Public identity and privacy notice
+
+- **26 October 2026:** The interface displays a compact green Vegan Australia wordmark-style identity and a link to the main homepage, without the main website navigation or a large footer. This is a typographic branding treatment, not an embedded official logo image.
+- A concise notice below the form links to `/privacy.html`, which discloses Cloudflare Turnstile and Worker processing, OpenAI API processing (`store:false` but not a guarantee of no provider retention), GitHub Pages hosting, possible operational/security logs, the absence of a separate application database, and voluntary email feedback. Keep the notice accurate if services, code, logging or provider policies change.
+- Main site policy: https://veganaustralia.org.au/privacy-policy/; service-specific notice: https://reviewer.veganaustralia.org.au/privacy.html.
+
 ### Reviewer instruction revisions
 
 - **26 October 2026 (v2.3 clarification):** In advocacy seeking to end a particular use of animals, distinguish abolition of that practice from the broader objective of ending all animal exploitation. Briefly note the narrower objective in the overall assessment when relevant, without making it an automatic language fault or requiring every focused article to argue for veganism. Test this with the Moruya rodeo campaign and unrelated news reporting.
 
 ### Live deployment and review feedback
 
-- **Frontend:** https://vacmanager.github.io/animal-rights-reviewer/ (GitHub Pages, `main` branch, repository root).
+- **Frontend:** https://reviewer.veganaustralia.org.au/ (custom domain with Enforce HTTPS; GitHub Pages, `main` branch, repository root). The GitHub Pages project address is retained behind the custom domain.
 - **Worker:** https://animal-rights-language-reviewer-api.white-voice-896d.workers.dev (Cloudflare Worker, source directory `worker/`). Cloudflare is connected to the GitHub `main` branch for automatic deployments.
 - **API model:** `gpt-6.1-sol`, medium reasoning; this is a provisional tested configuration. Version 2.3 reviewer instructions and the combined reference guide are supplied separately on every request.
 - **Feedback:** after a completed review, visitors can select **Helpful** or **Not helpful**, optionally add a comment (up to 1,200 characters), and click **Email feedback**. The browser requests a new tab for a pre-addressed email draft to `info@veganaustralia.org.au`. Browsers and installed mail handlers control how `mailto:` opens. Visitors must send the draft themselves; feedback is never sent or stored automatically by the website. **The document and generated review are not included in the draft.** Only the selected rating and optional comment are included. This deliberately simple mechanism can be replaced by a dedicated feedback service later.
