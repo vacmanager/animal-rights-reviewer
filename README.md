@@ -62,7 +62,7 @@ Worker JSON -> browser HTML-rendered report and copy function
 
 ### Security, privacy and operating limits
 
-- The website supports pasted text, `.txt` and `.md` only; **no PDF or Word extraction yet**. Limit: **20,000 characters** per review and at least 80. A request-size limit also applies at the Worker.
+- The website supports pasted text, `.txt` and `.md` only; **no PDF or Word extraction yet**. Limit: **20,000 characters** per review; any non-empty text is accepted. A request-size limit also applies at the Worker.
 - A Cloudflare Turnstile token must be **verified server-side** before contacting OpenAI. Site hostname is checked when configured. Client-origin filtering is not sufficient protection on its own.
 - Worker rate limiting is **3 requests/minute per connecting IP per Cloudflare location**. It is approximate and can affect users sharing an IP. Turnstile and API project limits are additional controls, not guarantees against abuse or cost overruns.
 - The Worker sends text to OpenAI and requests `store:false`. It does not intentionally persist submissions or generated reports. Third-party service processing, retention and security policies still apply; avoid claiming absolute confidentiality or zero retention.
