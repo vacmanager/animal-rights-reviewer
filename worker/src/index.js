@@ -9,8 +9,11 @@ const jsonHeaders = {'Content-Type': 'application/json; charset=utf-8', 'Cache-C
 function reply(body, status = 200, cors = {}) {
   return new Response(JSON.stringify(body), {status, headers: {...jsonHeaders, ...cors}});
 }
+function isAllowed(value, configured) {
+  return !!value && String(configured || '').split(',').map(s => s.trim()).includes(value);
+}
 function corsHeaders(origin, allowed) {
-  return origin && origin === allowed ? {
+  return isAllowed(origin, allowed) ? {
     'Access-Control-Allow-Origin': origin,
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
@@ -25,7 +28,7 @@ async function verifyTurnstile(token, env) {
   const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', { method: 'POST', body: data });
   if (!response.ok) return false;
   const result = await response.json();
-  return result.success === true && (!env.EXPECTED_HOSTNAME || result.hostname === env.EXPECTED_HOSTNAME);
+  return result.success === true && (!env.EXPECTED_HOSTNAME || isAllowed(result.hostname, env.EXPECTED_HOSTNAME));
 }
 function outputText(data) {
   // Responses API output is a collection; don't assume output[0] is a message.
@@ -39,7 +42,7 @@ export default {
     const path = new URL(request.url).pathname;
     if (path === '/health' && request.method === 'GET') return reply({ok:true, version:'0.1.0'}, 200, cors);
     if (path !== '/review') return reply({error:'Not found'}, 404, cors);
-    if (origin !== env.ALLOWED_ORIGIN) return reply({error:'Origin not allowed'}, 403);
+    if (!isAllowed(origin, env.ALLOWED_ORIGIN)) return reply({error:'Origin not allowed'}, 403);
     if (request.method === 'OPTIONS') return new Response(null, {status:204, headers:cors});
     if (request.method !== 'POST') return reply({error:'Method not allowed'}, 405, cors);
     if (!env.OPENAI_API_KEY || !env.TURNSTILE_SECRET_KEY || !env.MODEL) return reply({error:'Service not configured'}, 503, cors);
