@@ -24,7 +24,7 @@
   const MAX = 20000;
   function ready() {
     counter.textContent = `${area.value.length.toLocaleString()} / ${MAX.toLocaleString()} characters`;
-    button.disabled = !token || area.value.trim().length < 80 || area.value.length > MAX || !cfg.apiBase?.startsWith('https://');
+    button.disabled = !token || area.value.trim().length === 0 || area.value.length > MAX || !cfg.apiBase?.startsWith('https://');
   }
   function setStatus(message, isError = false) {
     status.textContent = message;
