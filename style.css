@@ -23,3 +23,23 @@
 
 /* Turnstile appears only if interaction is needed; status labels the security check. */
 .security-status{font-size:.8rem;color:var(--muted);margin:4px 0 12px}
+
+/* Compact Vegan Australia identity; intentionally no site-wide menu. */
+.brand-bar{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding:0 0 22px;margin-bottom:29px}
+.brand-link{display:inline-flex;flex-direction:column;align-items:flex-start;padding:9px 16px 10px;background:#285b42;color:white;text-decoration:none;border-radius:3px;line-height:1.05}
+.brand-link:hover,.brand-link:focus-visible{background:#184d35;color:white}
+.brand-name{display:flex;flex-direction:column;align-items:flex-start;line-height:.95}
+.brand-vegan{font-size:2rem;font-weight:800;letter-spacing:-.055em}
+.brand-australia{font-size:.79rem;font-weight:800;letter-spacing:.16em;margin-top:3px}
+.brand-tagline{font-size:.67rem;letter-spacing:.012em;margin-top:7px}
+.back-home{color:var(--accent);font-size:.94rem;font-weight:650;text-decoration:underline;text-underline-offset:3px}
+a{color:var(--accent)}
+a:focus-visible{outline:3px solid #8bd1b5;outline-offset:3px}
+.simple-footer{border-top:1px solid var(--border);padding:22px 0 0;margin-top:26px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;color:var(--muted);font-size:.9rem}
+.simple-footer a{color:var(--accent)}
+.privacy-page .panel{margin-top:16px}
+.policy-content h2{font-size:1.18rem;margin:24px 0 7px}
+.policy-content h2:first-child{margin-top:0}
+.policy-content p{margin:0 0 13px}
+.policy-date{font-size:.85rem;color:var(--muted);margin-top:25px!important}
+@media(max-width:570px){.brand-bar{gap:14px;margin-bottom:22px}.brand-link{padding:8px 13px}.brand-vegan{font-size:1.7rem}.back-home{font-size:.86rem}}
