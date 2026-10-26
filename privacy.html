@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="How Vegan Australia's Animal rights language reviewer handles documents, feedback and technical information.">
+  <title>Privacy information – Animal rights language reviewer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="shell privacy-page">
+    <div class="brand-bar">
+      <a class="brand-link" href="https://veganaustralia.org.au/" aria-label="Vegan Australia home">
+        <span class="brand-name"><span class="brand-vegan">vegan</span><span class="brand-australia">AUSTRALIA</span></span>
+        <span class="brand-tagline">Love life, live vegan.</span>
+      </a>
+      <a class="back-home" href="https://veganaustralia.org.au/">Vegan Australia home <span aria-hidden="true">↗</span></a>
+    </div>
+    <header>
+      <div class="eyebrow">Animal rights language reviewer</div>
+      <h1>Privacy information</h1>
+      <p class="lead">This information explains how the reviewer at <strong>reviewer.veganaustralia.org.au</strong> handles text submitted for analysis and optional feedback.</p>
+      <p><a href="./">← Return to the reviewer</a></p>
+    </header>
+    <section class="panel policy-content">
+      <h2>Who operates this service?</h2>
+      <p>The Animal rights language reviewer is provided by <a href="https://veganaustralia.org.au/">Vegan Australia</a>. It offers automated, advisory feedback about language and assumptions relating to other animals, their rights and veganism. For general enquiries, email <a href="mailto:info@veganaustralia.org.au">info@veganaustralia.org.au</a>.</p>
+
+      <h2>What happens when you submit text?</h2>
+      <p>When you select <strong>Review language</strong>, the text you entered (or loaded from a .txt or .md file) is sent over HTTPS to a Cloudflare Worker operated for this service. The Worker forwards the text, together with the review instructions and reference material, to OpenAI's API for analysis. The generated review is returned to your browser for display.</p>
+      <p>The reviewer does not require an account, name or email address to obtain a review. The service accepts a maximum of 20,000 characters per submission. <strong>Do not submit confidential, private or sensitive information, including information about another person that you are not authorised to share.</strong></p>
+
+      <h2>Storage and retention</h2>
+      <p>The reviewer application does not intentionally save submitted documents or generated reviews to an application database. Reviews remain visible in your browser until you clear them, reload the page or leave it. The Worker sends requests to OpenAI with the API setting <code>store: false</code>, which means the response is not requested to be stored as a retrievable Responses API object. <strong>This does not mean that OpenAI or infrastructure providers retain no information.</strong> OpenAI may process or retain API data in accordance with its applicable policies, including for abuse monitoring. Cloudflare and GitHub Pages may process technical request information and retain operational/security records under their own policies.</p>
+      <p>There is no separate visitor analytics or advertising-tracking script in this reviewer application's current code. Ordinary browser, hosting and security-service data processing still occurs.</p>
+
+      <h2>Security checks and technical data</h2>
+      <p>The website is hosted using GitHub Pages. Cloudflare handles the security check (Turnstile) and receives review requests through the Worker. To verify requests and apply approximate rate limits, the service processes security tokens and technical data such as your network address and request origin. Cloudflare's security mechanisms may use cookies or similar browser technologies. The Worker uses an IP-based rate-limit service, but does not intentionally write your document into application logs.</p>
+
+      <h2>Optional feedback</h2>
+      <p>After a review, you can mark it as <strong>Helpful</strong> or <strong>Not helpful</strong> and optionally add a comment. Selecting <strong>Email feedback</strong> asks your browser to open an email draft addressed to Vegan Australia. <strong>No feedback is sent unless you send that email yourself.</strong> The draft contains only your rating and any comment you enter; it does not automatically include your submitted document or generated review. If sent, your message, name/email address and any information you voluntarily include will be handled through ordinary email systems.</p>
+
+      <h2>Accuracy and decisions</h2>
+      <p>Reviews are generated automatically and may contain errors, omissions or disputed interpretations. They are advisory, not a substitute for your own judgement. The service does not independently fact-check the submitted text.</p>
+
+      <h2>External services and more information</h2>
+      <p>For information about the services involved, consult <a href="https://openai.com/policies/">OpenAI's policies</a>, <a href="https://www.cloudflare.com/privacypolicy/">Cloudflare's privacy policy</a> and <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">GitHub's privacy statement</a>. You can also read <a href="https://veganaustralia.org.au/privacy-policy/">Vegan Australia's general privacy policy</a>. This page describes the reviewer's particular data flows, which differ from those of the main website.</p>
+
+      <h2>Contact and updates</h2>
+      <p>For privacy questions, correction requests or concerns about the service, contact <a href="mailto:info@veganaustralia.org.au">info@veganaustralia.org.au</a>. This notice may be updated if the technology or handling of information changes.</p>
+      <p class="policy-date">Updated 26 October 2026.</p>
+    </section>
+    <div class="simple-footer"><span>A tool from <a href="https://veganaustralia.org.au/">Vegan Australia</a></span><a href="./">Return to reviewer</a></div>
+  </main>
+</body>
+</html>
