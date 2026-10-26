@@ -40,3 +40,6 @@ a:focus-visible{outline:3px solid #8bd1b5;outline-offset:3px}
 .policy-content p{margin:0 0 13px}
 .policy-date{font-size:.85rem;color:var(--muted);margin-top:25px!important}
 @media(max-width:570px){.brand-bar{gap:14px;margin-bottom:22px}.brand-logo{width:165px}.back-home{font-size:.86rem}}
+
+/* After successful security verification, remove the misleading Cloudflare “Success!” panel. It reappears when a new challenge is needed. */
+.challenge.verified{display:none}
