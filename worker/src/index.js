@@ -1,4 +1,5 @@
 import instructions from '../reference/instructions.md';
+import independentStatements from '../reference/independent-statements.md';
 import guide from '../reference/language-guide.md';
 
 const MAX_TEXT_LENGTH = 20000;
@@ -78,7 +79,7 @@ export default {
             max_output_tokens: 11000,
             reasoning: {effort: 'medium'},
             input: [
-              {role: 'developer', content: instructions + '\n\nREFERENCE PRINCIPLES AND LANGUAGE GUIDE:\n' + guide},
+              {role: 'developer', content: instructions + '\n\nADDITIONAL REVIEW GUIDANCE:\n' + independentStatements + '\n\nREFERENCE PRINCIPLES AND LANGUAGE GUIDE:\n' + guide},
               {role: 'user', content: task}
             ]
           }),
