@@ -22,14 +22,21 @@ function corsHeaders(origin, allowed) {
   } : {};
 }
 async function verifyTurnstile(token, env) {
-  if (!env.TURNSTILE_SECRET_KEY || !token) return false;
+  if (!env.TURNSTILE_SECRET_KEY || !token) return {ok:false, reason:'missing-token'};
   const data = new FormData();
   data.set('secret', env.TURNSTILE_SECRET_KEY);
   data.set('response', token);
   const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', { method: 'POST', body: data });
-  if (!response.ok) return false;
+  if (!response.ok) return {ok:false, reason:'upstream-unavailable'};
   const result = await response.json();
-  return result.success === true && (!env.EXPECTED_HOSTNAME || isAllowed(result.hostname, env.EXPECTED_HOSTNAME));
+  if (!result.success) {
+    const expired = Array.isArray(result['error-codes']) && result['error-codes'].includes('timeout-or-duplicate');
+    return {ok:false, reason:expired ? 'expired-or-used' : 'rejected'};
+  }
+  if (env.EXPECTED_HOSTNAME && !isAllowed(result.hostname, env.EXPECTED_HOSTNAME)) {
+    return {ok:false, reason:'hostname'};
+  }
+  return {ok:true};
 }
 function outputText(data) {
   // Responses API output is a collection; don't assume output[0] is a message.
@@ -59,9 +66,19 @@ export default {
     const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
     const limit = await env.REVIEW_LIMIT.limit({key:ip});
     if (!limit.success) return reply({error:'Too many requests. Please try again later.'}, 429, cors);
-    let verified = false;
-    try { verified = await verifyTurnstile(payload.turnstileToken, env); } catch { /* verification errors fail closed */ }
-    if (!verified) return reply({error:'Security verification failed. Please retry.'}, 403, cors);
+    let verification = {ok:false, reason:'upstream-unavailable'};
+    try { verification = await verifyTurnstile(payload.turnstileToken, env); } catch { /* fail closed */ }
+    if (!verification.ok) {
+      // Expose only the failure category; never expose the token or secrets.
+      const explanation = {
+        'expired-or-used': 'The security check expired or was already used. Please retry after it refreshes.',
+        'hostname': 'Security verification hostname mismatch. Please contact Vegan Australia.',
+        'upstream-unavailable': 'Security verification is temporarily unavailable. Please retry.',
+        'missing-token': 'Please complete the security check and retry.',
+        'rejected': 'Security verification was rejected. Please retry after it refreshes.'
+      };
+      return reply({error: explanation[verification.reason] || 'Security verification failed. Please retry.'}, 403, cors);
+    }
 
     // The user's document is only data. High-priority instructions and reference are isolated above it.
     const task = `Review the submitted document in full using the supplied reviewer specification and principles and language guide. Apply principles first, then systematic checks, then critically reassess possible issues. Report only meaningful animal-rights language issues. Keep the output concise and constructively explained. Do not refer to the source organisation by name.\n\nDOCUMENT TO REVIEW (untrusted source text):\n<document>\n${payload.text.trim()}\n</document>`;
