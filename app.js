@@ -20,6 +20,7 @@
   let feedbackRating = '';
   let widgetId = null;
   let token = '';
+  let tokenIssuedAt = 0;
   let lastReport = '';
   const MAX = 20000;
   function ready() {
@@ -38,13 +39,14 @@
     widgetId = window.turnstile.render('#challenge', {
       sitekey: cfg.turnstileSiteKey,
       appearance: 'interaction-only',
-      callback: t => { token = t; challenge.classList.add('verified'); securityStatus.textContent = 'Security check complete'; ready(); },
-      'expired-callback': () => { token=''; challenge.classList.remove('verified'); securityStatus.textContent = 'Refreshing browser security check…'; ready(); },
-      'error-callback': (errorCode) => { token=''; challenge.classList.remove('verified'); securityStatus.textContent = 'Security check needs attention'; ready(); setStatus(`Security check failed (Cloudflare code: ${errorCode || 'unknown'}). Please verify the site key and authorised hostname.`,true); }
+      callback: t => { token = t; tokenIssuedAt = Date.now(); challenge.classList.add('verified'); securityStatus.textContent = 'Security check complete'; ready(); },
+      'expired-callback': () => { token=''; tokenIssuedAt=0; challenge.classList.remove('verified'); securityStatus.textContent = 'Refreshing browser security check…'; ready(); },
+      'error-callback': (errorCode) => { token=''; tokenIssuedAt=0; challenge.classList.remove('verified'); securityStatus.textContent = 'Security check needs attention'; ready(); setStatus(`Security check failed (Cloudflare code: ${errorCode || 'unknown'}). Please verify the site key and authorised hostname.`,true); }
     });
   }
   function resetChallenge() {
     token = '';
+    tokenIssuedAt = 0;
     challenge.classList.remove('verified');
     securityStatus.textContent = 'Refreshing browser security check…';
     if (widgetId !== null && window.turnstile) window.turnstile.reset(widgetId);
@@ -145,6 +147,13 @@
   });
   button.addEventListener('click', async () => {
     if(button.disabled) return;
+    // Refresh before sending an ageing five-minute, one-use Turnstile token.
+    // Do not submit until the replacement check has actually succeeded.
+    if (!tokenIssuedAt || Date.now() - tokenIssuedAt > 240000) {
+      resetChallenge();
+      setStatus('The security check was refreshed because it was getting old. Please click Review language again when verification finishes.');
+      return;
+    }
     button.disabled=true;clearButton.disabled=true;results.hidden=true;
     copyButton.textContent = 'Copy review';
     copyStatus.textContent = '';
