@@ -41,7 +41,28 @@
       appearance: 'interaction-only',
       callback: t => { token = t; tokenIssuedAt = Date.now(); challenge.classList.add('verified'); securityStatus.textContent = 'Security check complete'; ready(); },
       'expired-callback': () => { token=''; tokenIssuedAt=0; challenge.classList.remove('verified'); securityStatus.textContent = 'Refreshing browser security check…'; ready(); },
-      'error-callback': (errorCode) => { token=''; tokenIssuedAt=0; challenge.classList.remove('verified'); securityStatus.textContent = 'Security check needs attention'; ready(); setStatus(`Security check failed (Cloudflare code: ${errorCode || 'unknown'}). Please verify the site key and authorised hostname.`,true); }
+      'timeout-callback': () => {
+        token = ''; tokenIssuedAt = 0;
+        challenge.classList.remove('verified');
+        securityStatus.textContent = 'Security check timed out; refreshing…';
+        ready();
+      },
+      'error-callback': (errorCode) => {
+        token = ''; tokenIssuedAt = 0;
+        challenge.classList.remove('verified');
+        ready();
+        const code = String(errorCode || '');
+        // Cloudflare automatically retries transient 300*/600* failures.
+        // Do not turn a background retry into a permanent-looking red form error.
+        const configurationError = ['110100','110110','110200','400020','400021','400070'].includes(code);
+        if (configurationError) {
+          securityStatus.textContent = 'Security setup needs attention';
+          setStatus(`Security configuration error (Cloudflare code: ${code}). Please contact Vegan Australia.`, true);
+        } else {
+          securityStatus.textContent = 'Security check interrupted; Cloudflare is retrying…';
+        }
+        return true;
+      }
     });
   }
   function resetChallenge() {
