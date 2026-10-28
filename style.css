@@ -43,3 +43,6 @@ a:focus-visible{outline:3px solid #8bd1b5;outline-offset:3px}
 
 /* After successful security verification, remove the misleading Cloudflare “Success!” panel. It reappears when a new challenge is needed. */
 .challenge.verified{display:none}
+
+/* Make the action needed after a stale security check unmistakable. */
+.retry-instruction{color:#a32626;font-weight:750}
