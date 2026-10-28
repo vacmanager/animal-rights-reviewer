@@ -31,6 +31,13 @@
     status.textContent = message;
     status.style.color = isError ? '#a32626' : '';
   }
+  function setRetryStatus() {
+    setStatus('The security check was refreshed because it was getting old. ');
+    const emphasis = document.createElement('strong');
+    emphasis.className = 'retry-instruction';
+    emphasis.textContent = 'Please click Review text again when verification finishes.';
+    status.appendChild(emphasis);
+  }
   function initTurnstile() {
     if (!cfg.turnstileSiteKey || cfg.turnstileSiteKey.startsWith('YOUR_')) {
       setStatus('Site setup is incomplete: configure the public Turnstile site key.', true); return;
@@ -172,7 +179,7 @@
     // Do not submit until the replacement check has actually succeeded.
     if (!tokenIssuedAt || Date.now() - tokenIssuedAt > 240000) {
       resetChallenge();
-      setStatus('The security check was refreshed because it was getting old. Please click Review language again when verification finishes.');
+      setRetryStatus();
       return;
     }
     button.disabled=true;clearButton.disabled=true;results.hidden=true;
