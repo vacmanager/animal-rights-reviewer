@@ -46,3 +46,9 @@ a:focus-visible{outline:3px solid #8bd1b5;outline-offset:3px}
 
 /* Make the action needed after a stale security check unmistakable. */
 .retry-instruction{color:#a32626;font-weight:750}
+
+/* Optional closer editorial scrutiny; leave the default review unobtrusive. */
+.review-mode{margin:4px 0 16px}
+.mode-choice{display:flex;align-items:center;gap:9px;margin:0;font-weight:650;cursor:pointer}
+.mode-choice input{width:18px;height:18px;margin:0;accent-color:var(--accent);flex:none}
+.mode-description{font-size:.89rem;color:var(--muted);margin:3px 0 0 27px;line-height:1.5}
