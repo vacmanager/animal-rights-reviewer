@@ -5,6 +5,7 @@
   const file = document.getElementById('file');
   const button = document.getElementById('review');
   const clearButton = document.getElementById('clear');
+  const detailedReview = document.getElementById('detailed-review');
   const status = document.getElementById('status');
   const securityStatus = document.getElementById('security-status');
   const challenge = document.getElementById('challenge');
@@ -195,7 +196,7 @@
     try{
       const response=await fetch(`${cfg.apiBase.replace(/\/$/,'')}/review`,{
         method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({text:area.value,turnstileToken:token})
+        body:JSON.stringify({text:area.value,turnstileToken:token,reviewMode:detailedReview.checked ? 'detailed' : 'standard'})
       });
       const body=await response.json();
       if(!response.ok)throw new Error(body.error || 'Review unavailable');
