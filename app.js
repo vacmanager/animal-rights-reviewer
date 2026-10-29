@@ -23,6 +23,12 @@
   let token = '';
   let tokenIssuedAt = 0;
   let lastReport = '';
+  let copyResetTimer = null;
+  function resetCopyFeedback() {
+    if (copyResetTimer !== null) clearTimeout(copyResetTimer);
+    copyResetTimer = null;
+    resetCopyFeedback();
+  }
   const MAX = 20000;
   function ready() {
     counter.textContent = `${area.value.length.toLocaleString()} / ${MAX.toLocaleString()} characters`;
@@ -158,8 +164,7 @@
     results.hidden = true;
     status.classList.remove('loading');
     setStatus('');
-    copyButton.textContent = 'Copy review';
-    copyStatus.textContent = '';
+    resetCopyFeedback();
     feedbackRating = '';
     feedbackComment.value = '';
     feedbackStatus.textContent = '';
@@ -211,6 +216,8 @@
       await navigator.clipboard.writeText(lastReport);
       copyButton.textContent = 'Copied!';
       copyStatus.textContent = 'Review copied to clipboard.';
+      if (copyResetTimer !== null) clearTimeout(copyResetTimer);
+      copyResetTimer = setTimeout(resetCopyFeedback, 10000);
     } catch {
       copyStatus.textContent = 'Unable to copy. Please select and copy the review manually.';
     }
