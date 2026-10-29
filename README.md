@@ -24,7 +24,7 @@ For a fallback command-line deployment, install Node.js and run `npm install`, `
 
 ```text
 Browser (GitHub Pages: index.html, app.js, style.css, config.js)
-    | POST /review { text, turnstileToken } HTTPS
+    | POST /review { text, turnstileToken, reviewMode } HTTPS
     v
 Cloudflare Worker (src/index.js)
     | -- validates CORS origin / size / Turnstile / rate limit
@@ -62,6 +62,7 @@ Worker JSON -> browser HTML-rendered report and copy function
 
 ### Security, privacy and operating limits
 
+- Optional **Detailed editorial review** checkbox sends `reviewMode: "detailed"` to the Worker, which appends closer editorial guidance while retaining the standard reviewer principles and full reference. Omitted or `standard` modes use the original prompt. Unknown modes are rejected. The public description uses the phrase “language that respects the rights of our fellow animals”.
 - The website supports pasted text, `.txt` and `.md` only; **no PDF or Word extraction yet**. Limit: **20,000 characters** per review; any non-empty text is accepted. A request-size limit also applies at the Worker.
 - A Cloudflare Turnstile token must be **verified server-side** before contacting OpenAI. Site hostname is checked when configured. Client-origin filtering is not sufficient protection on its own.
 - Worker rate limiting is **3 requests/minute per connecting IP per Cloudflare location**. It is approximate and can affect users sharing an IP. Turnstile and API project limits are additional controls, not guarantees against abuse or cost overruns.
