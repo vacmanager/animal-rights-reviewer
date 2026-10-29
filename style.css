@@ -3,8 +3,7 @@
 .status.loading{display:flex;align-items:center;gap:10px}
 .status.loading::before{content:'';width:17px;height:17px;flex:0 0 17px;border:3px solid #cadad0;border-top-color:var(--accent);border-radius:50%;animation:review-spin .85s linear infinite}
 @keyframes review-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-@media(prefers-reduced-motion:reduce){.status.loading::before{animation:none;border-color:var(--accent);border-right-color:#cadad0}}
-/* Some browsers apply reduced-motion preferences: keep a distinguishable progress icon without rotating it. */
+/* Keep the busy indicator rotating; previously a reduced-motion rule stopped it entirely. */
 .copy-controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 #copy-status{font-size:.88rem;color:var(--accent)}
 
