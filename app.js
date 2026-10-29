@@ -27,7 +27,8 @@
   function resetCopyFeedback() {
     if (copyResetTimer !== null) clearTimeout(copyResetTimer);
     copyResetTimer = null;
-    resetCopyFeedback();
+    copyButton.textContent = 'Copy review';
+    copyStatus.textContent = '';
   }
   const MAX = 20000;
   function ready() {
@@ -189,8 +190,7 @@
       return;
     }
     button.disabled=true;clearButton.disabled=true;results.hidden=true;
-    copyButton.textContent = 'Copy review';
-    copyStatus.textContent = '';
+    resetCopyFeedback();
     feedbackRating = '';
     feedbackComment.value = '';
     feedbackStatus.textContent = '';
