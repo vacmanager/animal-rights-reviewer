@@ -30,7 +30,7 @@
     copyButton.textContent = 'Copy review';
     copyStatus.textContent = '';
   }
-  const MAX = 20000;
+  const MAX = 30000;
   function ready() {
     counter.textContent = `${area.value.length.toLocaleString()} / ${MAX.toLocaleString()} characters`;
     button.disabled = !token || area.value.trim().length === 0 || area.value.length > MAX || !cfg.apiBase?.startsWith('https://');
@@ -177,7 +177,7 @@
   area.addEventListener('input', ready);
   file.addEventListener('change', async () => {
     const selected = file.files?.[0]; if(!selected) return;
-    if(!/\.(txt|md)$/i.test(selected.name) || selected.size > 80000){setStatus('Please select a .txt or .md file under 80 KB.',true);return;}
+    if(!/\.(txt|md)$/i.test(selected.name) || selected.size > 180000){setStatus('Please select a .txt or .md file under 180 KB.',true);return;}
     area.value = await selected.text(); ready(); setStatus(`Loaded ${selected.name}.`);
   });
   button.addEventListener('click', async () => {
