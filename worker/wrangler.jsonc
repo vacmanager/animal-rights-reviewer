@@ -41,5 +41,8 @@
     "issues": {
       "enabled": false
     }
+  },
+  "placement": {
+    "region": "aws:ap-southeast-2"
   }
 }
