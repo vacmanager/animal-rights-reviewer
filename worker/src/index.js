@@ -123,7 +123,21 @@ export default {
         if (!response.ok) {
           // Show only a safe status classification; never echo upstream messages,
           // request contents, API keys or other provider response data.
-          console.warn('Review upstream request failed', {status: response.status});
+          // Log only whitelisted API error identifiers, never messages or request data.
+          let errorType = 'unknown';
+          let errorCode = 'unknown';
+          try {
+            const upstream = await response.json();
+            const safeIdentifier = value =>
+              typeof value === 'string' && /^[a-zA-Z0-9_.-]{1,100}$/.test(value) ? value : 'unavailable';
+            errorType = safeIdentifier(upstream?.error?.type);
+            errorCode = safeIdentifier(upstream?.error?.code);
+          } catch {
+            // The upstream error body may not be JSON (for example an edge 403).
+          }
+          console.warn('Review upstream request failed', {
+            status: response.status, errorType, errorCode
+          });
           const message = response.status === 429
             ? 'Review service is busy (OpenAI HTTP 429). Please try again later.'
             : 'The review service rejected the request (OpenAI HTTP ' + response.status + '). Please try again later or report this code.';
