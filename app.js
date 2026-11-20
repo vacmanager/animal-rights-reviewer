@@ -24,6 +24,39 @@
   let tokenIssuedAt = 0;
   let lastReport = '';
   let copyResetTimer = null;
+  let reviewing = false;
+  let verificationWaiter = null;
+  const VERIFICATION_TIMEOUT_MS = 45000;
+  const TOKEN_MAX_AGE_MS = 240000;
+  function resolveVerification() {
+    if (!verificationWaiter) return;
+    const waiter = verificationWaiter;
+    verificationWaiter = null;
+    clearTimeout(waiter.timer);
+    waiter.resolve(token);
+  }
+  function rejectVerification(message) {
+    if (!verificationWaiter) return;
+    const waiter = verificationWaiter;
+    verificationWaiter = null;
+    clearTimeout(waiter.timer);
+    waiter.reject(new Error(message));
+  }
+  function freshToken() {
+    return token && tokenIssuedAt && Date.now() - tokenIssuedAt < TOKEN_MAX_AGE_MS;
+  }
+  function waitForVerification() {
+    if (freshToken()) return Promise.resolve(token);
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => {
+        verificationWaiter = null;
+        reject(new Error('Browser security verification took too long. Please try again.'));
+      }, VERIFICATION_TIMEOUT_MS);
+      verificationWaiter = {resolve, reject, timer};
+      if (widgetId !== null && window.turnstile) resetChallenge();
+      // If Turnstile has not loaded yet, initTurnstile will render it shortly.
+    });
+  }
   function resetCopyFeedback() {
     if (copyResetTimer !== null) clearTimeout(copyResetTimer);
     copyResetTimer = null;
@@ -33,33 +66,29 @@
   const MAX = 30000;
   function ready() {
     counter.textContent = `${area.value.length.toLocaleString()} / ${MAX.toLocaleString()} characters`;
-    button.disabled = !token || area.value.trim().length === 0 || area.value.length > MAX || !cfg.apiBase?.startsWith('https://');
+    button.disabled = reviewing || area.value.trim().length === 0 || area.value.length > MAX || !cfg.apiBase?.startsWith('https://') || !cfg.turnstileSiteKey || cfg.turnstileSiteKey.startsWith('YOUR_');
   }
   function setStatus(message, isError = false) {
     status.textContent = message;
     status.style.color = isError ? '#a32626' : '';
   }
-  function setRetryStatus() {
-    setStatus('The security check was refreshed because it was getting old. ');
-    const emphasis = document.createElement('strong');
-    emphasis.className = 'retry-instruction';
-    emphasis.textContent = 'Please click Review text again when verification finishes.';
-    status.appendChild(emphasis);
-  }
   function initTurnstile() {
     if (!cfg.turnstileSiteKey || cfg.turnstileSiteKey.startsWith('YOUR_')) {
-      setStatus('Site setup is incomplete: configure the public Turnstile site key.', true); return;
+      setStatus('Site setup is incomplete: configure the public Turnstile site key.', true);
+      rejectVerification('Browser security verification is not configured. Please contact Vegan Australia.');
+      return;
     }
     if (!window.turnstile) { setTimeout(initTurnstile, 250); return; }
     widgetId = window.turnstile.render('#challenge', {
       sitekey: cfg.turnstileSiteKey,
       appearance: 'interaction-only',
-      callback: t => { token = t; tokenIssuedAt = Date.now(); challenge.classList.add('verified'); securityStatus.textContent = 'Security check complete'; ready(); },
+      callback: t => { token = t; tokenIssuedAt = Date.now(); challenge.classList.add('verified'); securityStatus.textContent = 'Security check complete'; resolveVerification(); ready(); },
       'expired-callback': () => { token=''; tokenIssuedAt=0; challenge.classList.remove('verified'); securityStatus.textContent = 'Refreshing browser security check…'; ready(); },
       'timeout-callback': () => {
         token = ''; tokenIssuedAt = 0;
         challenge.classList.remove('verified');
         securityStatus.textContent = 'Security check timed out; refreshing…';
+        // Turnstile may retry; the pending review waits until verification succeeds or its deadline passes.
         ready();
       },
       'error-callback': (errorCode) => {
@@ -72,7 +101,9 @@
         const configurationError = ['110100','110110','110200','400020','400021','400070'].includes(code);
         if (configurationError) {
           securityStatus.textContent = 'Security setup needs attention';
-          setStatus(`Security configuration error (Cloudflare code: ${code}). Please contact Vegan Australia.`, true);
+          const message = `Security configuration error (Cloudflare code: ${code}). Please contact Vegan Australia.`;
+          rejectVerification(message);
+          setStatus(message, true);
         } else {
           securityStatus.textContent = 'Security check interrupted; Cloudflare is retrying…';
         }
@@ -182,14 +213,9 @@
   });
   button.addEventListener('click', async () => {
     if(button.disabled) return;
-    // Refresh before sending an ageing five-minute, one-use Turnstile token.
-    // Do not submit until the replacement check has actually succeeded.
-    if (!tokenIssuedAt || Date.now() - tokenIssuedAt > 240000) {
-      resetChallenge();
-      setRetryStatus();
-      return;
-    }
-    button.disabled=true;clearButton.disabled=true;results.hidden=true;
+    reviewing = true;
+    ready();
+    clearButton.disabled=true;results.hidden=true;
     resetCopyFeedback();
     feedbackRating = '';
     feedbackComment.value = '';
@@ -197,11 +223,13 @@
     feedbackSend.disabled = true;
     feedbackButtons.forEach(b => b.setAttribute('aria-pressed', 'false'));
     status.classList.add('loading');
-    setStatus('Reviewing your text… This may take a minute or two.');
+    setStatus(freshToken() ? 'Reviewing your text… This may take a minute or two.' : 'Verifying browser security…');
     try{
+      const verifiedToken = await waitForVerification();
+      setStatus('Reviewing your text… This may take a minute or two.');
       const response=await fetch(`${cfg.apiBase.replace(/\/$/,'')}/review`,{
         method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({text:area.value,turnstileToken:token,reviewMode:detailedReview.checked ? 'detailed' : 'standard'})
+        body:JSON.stringify({text:area.value,turnstileToken:verifiedToken,reviewMode:detailedReview.checked ? 'detailed' : 'standard'})
       });
       const body=await response.json();
       if(!response.ok)throw new Error(body.error || 'Review unavailable');
@@ -209,7 +237,13 @@
       setStatus('Review complete. The suggestions are advisory.');
       results.scrollIntoView({behavior:'smooth',block:'start'});
     }catch(error){setStatus(error.message || 'Unable to review. Try again later.',true);}
-    finally{status.classList.remove('loading');clearButton.disabled=false;resetChallenge();}
+    finally{
+      status.classList.remove('loading');
+      reviewing = false;
+      clearButton.disabled = false;
+      resetChallenge();
+      ready();
+    }
   });
   copyButton.addEventListener('click',async()=>{
     try {
