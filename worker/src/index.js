@@ -138,9 +138,11 @@ export default {
           console.warn('Review upstream request failed', {
             status: response.status, errorType, errorCode
           });
-          const message = response.status === 429
-            ? 'Review service is busy (OpenAI HTTP 429). Please try again later.'
-            : 'The review service rejected the request (OpenAI HTTP ' + response.status + '). Please try again later or report this code.';
+          const message = response.status === 403 && errorCode === 'unsupported_country_region_territory'
+            ? 'The review service is unavailable from this region because of an OpenAI geographic access restriction. Please try again from a supported country or region.'
+            : response.status === 429
+              ? 'Review service is busy (OpenAI HTTP 429). Please try again later.'
+              : 'The review service rejected the request (OpenAI HTTP ' + response.status + '). Please try again later or report this code.';
           return reply({error: message}, 502, cors);
         }
         result = await response.json();
