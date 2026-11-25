@@ -207,9 +207,31 @@
   });
   area.addEventListener('input', ready);
   file.addEventListener('change', async () => {
-    const selected = file.files?.[0]; if(!selected) return;
-    if(!/\.(txt|md)$/i.test(selected.name) || selected.size > 180000){setStatus('Please select a .txt or .md file under 180 KB.',true);return;}
-    area.value = await selected.text(); ready(); setStatus(`Loaded ${selected.name}.`);
+    const selected = file.files?.[0];
+    if (!selected) return;
+    // Clear the file input so selecting the same file again still fires 'change',
+    // including after cancelling a replacement.
+    file.value = '';
+    if (!/\.(txt|md)$/i.test(selected.name) || selected.size > 180000) {
+      setStatus('Please select a .txt or .md file under 180 KB.', true);
+      return;
+    }
+    if (area.value.length > 0 && !window.confirm('Loading this file will replace all text currently in the document box. Continue?')) {
+      return;
+    }
+    const textBeforeLoad = area.value;
+    try {
+      const contents = await selected.text();
+      // Avoid silently overwriting edits made while the file was being read.
+      if (area.value !== textBeforeLoad && !window.confirm('The document has changed while the file was loading. Replace its current text with the file contents?')) {
+        return;
+      }
+      area.value = contents;
+      ready();
+      setStatus(`Loaded ${selected.name}.`);
+    } catch {
+      setStatus('Unable to read the selected file. Please try again.', true);
+    }
   });
   button.addEventListener('click', async () => {
     if(button.disabled) return;
