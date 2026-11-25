@@ -38,6 +38,10 @@ Identify genre, audience, central claim, intended purpose, whose views are repre
 
 Do not penalise a climate report for examining emissions, a legal submission for accurately describing consumer transactions or welfare regulations, or an argument against 'humane' farming for presenting practical criticisms of that proposal. Nevertheless, scrutinise the habitual reduction of people to 'consumers' when they could instead be described as people, the public or citizens. Do not require a rights statement in every paragraph. Where the author establishes the abolitionist objective elsewhere, read local language against that context. Nevertheless, flag a material contradiction that changes the apparent ethical objective.
 
+### Markdown-formatted submissions
+
+When a submitted document contains Markdown markup, review the human-readable text and its intended meaning. Treat Markdown syntax (such as heading markers, emphasis, lists, links, blockquotes and code fences) as structure or formatting rather than prose or animal-rights language issues. Use headings, lists, quotations and meaningful link text as context. Do not mistake quoted or fenced examples for views endorsed by the author. Ignore link destinations and formatting syntax unless their content is directly relevant to the review. Do not recommend Markdown formatting changes as language corrections.
+
 ### HTML-formatted submissions
 
 When a submitted document contains HTML markup, review the human-readable article content. Treat HTML tags and attributes as structural information rather than prose. Ignore scripts, styles, navigation, metadata and other non-article material unless they contain text directly relevant to the review. Preserve the meaning and context of the original document, including relevant headings, quotations, links and image descriptions where they contribute to the argument. Do not treat markup itself as a language issue or recommend HTML changes.
