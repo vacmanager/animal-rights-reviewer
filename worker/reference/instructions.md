@@ -38,6 +38,10 @@ Identify genre, audience, central claim, intended purpose, whose views are repre
 
 Do not penalise a climate report for examining emissions, a legal submission for accurately describing consumer transactions or welfare regulations, or an argument against 'humane' farming for presenting practical criticisms of that proposal. Nevertheless, scrutinise the habitual reduction of people to 'consumers' when they could instead be described as people, the public or citizens. Do not require a rights statement in every paragraph. Where the author establishes the abolitionist objective elsewhere, read local language against that context. Nevertheless, flag a material contradiction that changes the apparent ethical objective.
 
+### HTML-formatted submissions
+
+When a submitted document contains HTML markup, review the human-readable article content. Treat HTML tags and attributes as structural information rather than prose. Ignore scripts, styles, navigation, metadata and other non-article material unless they contain text directly relevant to the review. Preserve the meaning and context of the original document, including relevant headings, quotations, links and image descriptions where they contribute to the argument. Do not treat markup itself as a language issue or recommend HTML changes.
+
 ## 5. Principles-first review method
 
 The guide deliberately explains **principles before examples**. Follow that order. Its examples are demonstrations of how a principle operates in actual language; they help readers and AI reviewers understand and apply the principle. They are **not** an exhaustive list of disallowed expressions, and their exact wording is not required for an issue to exist. Do not reduce the guide to a keyword blacklist or require a particular rights-based phrase in every paragraph.
